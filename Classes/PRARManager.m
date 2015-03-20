@@ -138,10 +138,11 @@
 
 - (void)startARWithData:(NSArray*)arData forLocation:(CLLocationCoordinate2D)location
 {
-    if (arData.count < 1) {
-        [self.delegate prarGotProblem:@"No AR Data" withDetails:nil];
-        return;
-    }
+    
+//    if (arData.count < 1) {
+//        [self.delegate prarGotProblem:@"No AR Data" withDetails:nil];
+//        return;
+//    }
     
     NSLog(@"Starting AR with %lu places", (unsigned long)arData.count);
     

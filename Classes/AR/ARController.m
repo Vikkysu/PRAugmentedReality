@@ -32,7 +32,13 @@
 
 #import "LocationMath.h"
 
+@interface ARController ()
+
+@end
+
+
 @implementation ARController
+
 
 // -- Shape warper -- //
 #define CATransform3DPerspective(t, x, y) (CATransform3DConcat(t, CATransform3DMake(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, 0, 0, 0, 0, 1)))
@@ -54,8 +60,10 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
 
 #pragma mark - AR builders
 
-- (NSDictionary*)buildAROverlaysForData:(NSArray*)arData andLocation:(CLLocationCoordinate2D)newLocation
+-(NSDictionary*)buildAROverlaysForData:(NSArray*)arData andLocation:(CLLocationCoordinate2D)newLocation
 {
+    LocationMath *locationMath = [LocationMath sharedExpert];
+    
     int x_pos = 0;
     ARObject *arObject;
     
@@ -67,7 +75,7 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
                                                                             [arObjectData[@"lon"] doubleValue])
                               andCurrentLocation:newLocation];
         
-        x_pos = [self.locationMath getARObjectXPosition:arObject]-arObject.view.frame.size.width;
+        x_pos = [locationMath getARObjectXPosition:arObject]-arObject.view.frame.size.width;
         
         geoobjectOverlays[ar_id] = arObject;
         geoobjectPositions[ar_id] = @(x_pos);
@@ -79,7 +87,7 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
     return geoobjectOverlays;
 }
 
-- (NSArray*)createRadarSpots
+-(NSArray*)createRadarSpots
 {    
     NSMutableArray *spots = [NSMutableArray arrayWithCapacity:geoobjectOverlays.count];
     
@@ -99,7 +107,7 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
     }
     return [NSArray arrayWithArray:spots];
 }
-- (void)setupDataForAR
+-(void)setupDataForAR
 {
     [self setVerticalPosWithDistance];
     [self checkForVerticalPosClashes];
@@ -111,17 +119,17 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
 // Warps the view into a parrallelogram shape in order to give it a 3D perspective
 -(void)warpView:(UIView*)arView atVerticalPosition:(int)verticalPos
 {
-    arView.layer.sublayerTransform = CATransform3DMakePerspective(0, verticalPos*-0.0004);
-    
-    float shrinkLevel = powf(0.9, verticalPos-1);
-    arView.transform = CGAffineTransformMakeScale(shrinkLevel, shrinkLevel);
+//    arView.layer.sublayerTransform = CATransform3DMakePerspective(0, verticalPos*-0.0004);
+//    
+//    float shrinkLevel = powf(0.9, verticalPos-1);
+//    arView.transform = CGAffineTransformMakeScale(shrinkLevel, shrinkLevel);
     
 }
 -(int)setYPosForView:(UIView*)arView atVerticalPos:(int)verticalPos
 {
     int pos = Y_CENTER-(int)(arView.frame.size.height*verticalPos);
-    pos -= (powf(verticalPos, 2)*4);
-    
+    /*pos -= (powf(verticalPos, 2)*4);*/ int a = pos-(arView.frame.size.height/2);
+    //NSLog(@"pos: %d, final: %d", pos, a);
     return pos-(arView.frame.size.height/2);
 }
 
@@ -240,19 +248,14 @@ CATransform3DMake(CGFloat m11, CGFloat m12, CGFloat m13, CGFloat m14,
     geoobjectVerts = [[NSMutableDictionary alloc] init];
 }
 
-- (id)init
+-(id)init
 {
     self = [super init];
     if (self) {
-        self.locationMath = [[LocationMath alloc] init];
         [self initAndAllocContainers];
     }
     return self;
 }
 
-- (void)dealloc
-{
-    [self.locationMath stopTracking];
-}
 
 @end

@@ -24,6 +24,8 @@
 // THE SOFTWARE.
 //
 
+
+#define REFRESH_RATE            0.01    // 100hz
 #define RADAR_ON                YES
 
 /**
